@@ -8,10 +8,14 @@ namespace NS\BNAME;
 class ORM extends \PHPixie\DefaultBundle\ORM
 {
     protected $entityMap = array(
-
+        /*entityGeneratorPlaceholder*/
     );
 
     protected $repositoryMap = array(
-
+        /*repositoryGeneratorPlaceholder*/
+    );
+    
+    protected $query = array(
+        /*queryGeneratorPlaceholder*/
     );
 }
