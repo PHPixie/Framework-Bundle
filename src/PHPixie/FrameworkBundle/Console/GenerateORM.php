@@ -1,22 +1,5 @@
 <?php
 
-/*
- * Copyright (C) 2017 sobolevna
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 namespace PHPixie\FrameworkBundle\Console;
 
 use PHPixie\Console\Command\Config;
@@ -24,7 +7,7 @@ use \PHPixie\Console\Exception\CommandException;
 
 /**
  * Description of GenerateORM
- *
+ * Console command to generate and register ORM  classes 
  * @author sobolevna
  */
 class GenerateORM extends \PHPixie\Console\Command\Implementation {
@@ -85,7 +68,6 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
         if ((empty($name[1]) && !$optionData->get('a')) || (!empty($name[1]) && $optionData->get('a'))) {
             throw new CommandException('You should either set a model name or raise an "-a" flag.');
         } elseif (!empty($name[1])) {
-            $this->writeLine('Preparing to make');
             $this->make($name[1], $argumentData->get('type'), $argumentData->get('connection'));
         } elseif ($optionData->get('a')) {
             $models = $this->builder->ormConfig()->getData('models');
@@ -126,7 +108,6 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
      * @param string $name
      */
     protected function generateClasses($name) {
-        $this->writeLine("Generating model $name");
         $model = ucfirst($name);
         $bundle = ucfirst($this->bundle);
 
@@ -143,13 +124,18 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
         $actions->createDirectory($destination);
 
         foreach (array('Repository', 'Entity', 'Query') as $wrapper) {
-            $this->writeLine("Preparing wrapper $wrapper");
             $this->makeClassFile($bundle, $model, $wrapper);
         }
     }
 
+    /**
+     * 
+     * @param string $bundle
+     * @param string $model
+     * @param string $wrapper
+     * @throws CommandException
+     */
     protected function makeClassFile($bundle, $model, $wrapper) {
-        $this->writeLine("Generating class \Project\\$bundle\\$model\\$wrapper");
         $src = $this->getTemplateDirectory() . "{$wrapper}.php";
         if (!file_exists($src)) {
             throw new CommandException("A template for {$wrapper} doesn't exists.");
@@ -165,6 +151,10 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
         $this->writeLine("Class '$wrapper' for model '$model' has been generated");
     }
 
+    /**
+     * 
+     * @param string $name
+     */
     protected function registerClasses($name) {
         $className = ucfirst($name);
         $modelName = lcfirst($name);
@@ -188,8 +178,13 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
         file_put_contents($pathORM, $this->prettifyText($txt));
     }
     
+    /**
+     * 
+     * @param string $name
+     * @param string $type
+     * @param string $connection
+     */
     protected function registerModel($name, $type, $connection) {
-        $this->writeLine("Registering model $name");
         $ormPath = $this->builder->assetsRoot()->path('config').'/orm.php';
         $this->writeLine($ormPath);
         if (!file_exists($ormPath)) {
@@ -209,10 +204,19 @@ class GenerateORM extends \PHPixie\Console\Command\Implementation {
         }
     }
     
+    /**
+     * 
+     * @param string $txt
+     * @return string
+     */
     protected function prettifyText($txt) {
         return str_replace('(,', "(", preg_replace('/(\n|\s|\t)*,/u', ',', $txt));
     }
 
+    /**
+     * 
+     * @return string
+     */
     protected function getTemplateDirectory() {
         return __DIR__ . '/../../../../assets/ormTemplate/';
     }
