@@ -14,7 +14,7 @@ class Console extends \PHPixie\Console\Registry\Provider\Implementation
     
     public function commandNames()
     {
-        return array('installWebAssets', 'generateBundle', 'database', 'migrate', 'seed');
+        return array('installWebAssets', 'generateBundle', 'database', 'migrate', 'seed', 'generateORM');
     }
     
     protected function buildInstallWebAssetsCommand($commandConfig)
@@ -51,5 +51,13 @@ class Console extends \PHPixie\Console\Registry\Provider\Implementation
     {
         $migrate = $this->frameworkBuilder->components()->migrate();
         return $migrate->consoleCommands()->buildCommand('seed', $commandConfig);
+    }
+    
+    protected function buildGenerateORMCommand($commandConfig)
+    {
+        return new Console\GenerateORM(
+            $commandConfig,
+            $this->frameworkBuilder
+        );
     }
 }
